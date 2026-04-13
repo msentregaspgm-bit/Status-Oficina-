@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oficina SV LOG - Status</title>
+    <title>Status Oficina - SV LOG</title>
     <style>
         :root {
             --sv-blue-dark: #000814;
@@ -29,6 +29,7 @@
             border-bottom: 4px solid var(--sv-yellow);
             text-align: center;
             margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .header h1 {
@@ -36,6 +37,7 @@
             font-size: 18px;
             color: white;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .action-bar {
@@ -58,7 +60,10 @@
             justify-content: center;
             gap: 8px;
             text-decoration: none;
+            transition: 0.2s;
         }
+
+        .btn:active { transform: scale(0.98); }
 
         .btn-refresh { background: var(--sv-yellow); color: var(--sv-blue-dark); }
         .btn-zap-geral { background: var(--whatsapp); color: white; }
@@ -90,17 +95,22 @@
             font-size: 13px;
         }
 
-        .frota-txt { font-weight: 800; color: white; }
-        .previsao-txt { color: var(--sv-yellow); font-weight: 700; }
+        .frota-txt { font-weight: 800; color: white; font-size: 15px; }
+        .previsao-txt { 
+            color: var(--sv-yellow); 
+            font-weight: 700; 
+            white-space: nowrap;
+        }
         
         .status-pill {
             background: rgba(255, 214, 10, 0.1);
             color: var(--sv-yellow);
-            padding: 4px 8px;
+            padding: 5px 8px;
             border-radius: 4px;
             font-size: 10px;
             font-weight: 800;
             border: 1px solid var(--sv-yellow);
+            display: inline-block;
         }
 
         .btn-zap-row {
@@ -113,7 +123,13 @@
             font-weight: bold;
         }
 
-        #loader { text-align: center; padding: 40px; color: var(--sv-yellow); font-weight: bold; }
+        #loader { 
+            text-align: center; 
+            padding: 40px; 
+            color: var(--sv-yellow); 
+            font-weight: bold; 
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -123,11 +139,11 @@
 </div>
 
 <div class="action-bar">
-    <button class="btn btn-refresh" onclick="carregarOficina()">🔄 Atualizar</button>
+    <button class="btn btn-refresh" onclick="carregarOficina()">🔄 Atualizar Dados</button>
     <a id="btnGeral" class="btn btn-zap-geral" target="_blank">📲 Status Geral</a>
 </div>
 
-<div id="loader">Sincronizando oficina...</div>
+<div id="loader">Buscando informações na oficina...</div>
 
 <div class="card-oficina" id="contentBox" style="display:none">
     <table>
@@ -135,7 +151,7 @@
             <tr>
                 <th>Frota / Serviço</th>
                 <th>Previsão Saída</th>
-                <th>Status</th>
+                <th>Status Atual</th>
                 <th>Ação</th>
             </tr>
         </thead>
@@ -144,50 +160,67 @@
 </div>
 
 <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbySwHmGSADJq5Vh1Drf0exOrnqTVXAQk8XSRC1CjYkRDuH3cGJqqjS4B8Qcm0DM4Kg/exec";
+    // IMPORTANTE: Cole aqui a URL gerada pela NOVA IMPLANTAÇÃO do seu Script
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyQQg-Eu00DSw5X7AOOnIRYeNJDG3wZcSe4jqYIOILbZBixXhoESzQHFDIxDjt9qafA/exec";
 
     async function carregarOficina() {
         const loader = document.getElementById('loader');
         const contentBox = document.getElementById('contentBox');
         const lista = document.getElementById('listaOficina');
+        const btnGeral = document.getElementById('btnGeral');
         
         loader.style.display = 'block';
+        loader.innerText = "Sincronizando oficina...";
         contentBox.style.display = 'none';
 
         try {
             const res = await fetch(URL_SCRIPT);
             const dados = await res.json();
             
+            if (dados.error) {
+                loader.innerText = "Erro: " + dados.error;
+                return;
+            }
+
             let html = "";
-            let resumoGeral = "*RESUMO OFICINA SV LOG*\n\n";
+            let resumoGeral = "*RESUMO OFICINA SV LOG*\n_Atualizado em: " + new Date().toLocaleString('pt-BR') + "_\n\n";
 
             dados.forEach(c => {
-                // Monta mensagem individual
-                const msgIndiv = encodeURIComponent(`*STATUS OFICINA*\nFrota: ${c.frota}\nServiço: ${c.tipo}\nSaída: ${c.previsao}\nStatus: ${c.status}`);
+                // Mensagem individual formatada
+                const msgIndiv = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Serviço:* ${c.tipo}\n📅 *Previsão Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`);
                 
-                // Monta resumo para o botão Geral
-                resumoGeral += `🚛 *Frota: ${c.frota}*\n🛠️ ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
+                // Acúmulo para o Status Geral
+                resumoGeral += `🚛 *Frota: ${c.frota}*\n📌 Status: ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
 
                 html += `
                     <tr>
-                        <td><span class="frota-txt">${c.frota}</span><br><small style="color:#888">${c.tipo}</small></td>
+                        <td>
+                            <span class="frota-txt">${c.frota}</span><br>
+                            <small style="color:#888; text-transform: uppercase;">${c.tipo}</small>
+                        </td>
                         <td class="previsao-txt">${c.previsao}</td>
                         <td><span class="status-pill">${c.status.toUpperCase()}</span></td>
-                        <td><a href="https://wa.me/?text=${msgIndiv}" target="_blank" class="btn-zap-row">ZAP</a></td>
+                        <td>
+                            <a href="https://wa.me/?text=${msgIndiv}" target="_blank" class="btn-zap-row">ZAP</a>
+                        </td>
                     </tr>
                 `;
             });
 
             lista.innerHTML = html;
-            document.getElementById('btnGeral').href = `https://wa.me/?text=${encodeURIComponent(resumoGeral)}`;
+            // Configura o link do botão de Status Geral
+            btnGeral.href = `https://wa.me/?text=${encodeURIComponent(resumoGeral)}`;
             
             loader.style.display = 'none';
             contentBox.style.display = 'block';
+
         } catch (e) {
-            loader.innerText = "Erro ao conectar com a oficina.";
+            loader.innerText = "Falha ao conectar com a planilha. Verifique a URL e a Implantação.";
+            console.error(e);
         }
     }
 
+    // Carregamento automático ao abrir a página
     carregarOficina();
 </script>
 
