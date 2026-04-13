@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SV LOG - Status Oficina</title>
+    <style>
+        :root { --sv-blue-dark: #001D3D; --sv-blue-mid: #003566; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; --amarelo: #FFD60A; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 15px; }
+
+        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 3px solid var(--sv-yellow); border-radius: 8px; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .header img { height: 40px; }
+        .header h1 { margin: 0; font-size: 18px; text-transform: uppercase; color: white; }
+
+        .table-card { background: var(--sv-blue-mid); border-radius: 12px; padding: 10px; overflow-x: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 12px; color: var(--sv-yellow); border-bottom: 2px solid rgba(255,255,255,0.1); font-size: 12px; text-transform: uppercase; }
+        td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+        
+        .status-badge { background: rgba(255, 214, 10, 0.2); color: var(--sv-yellow); padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: 800; border: 1px solid var(--sv-yellow); }
+        .btn-refresh { background: var(--sv-yellow); color: var(--sv-blue-dark); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; width: 100%; text-transform: uppercase; }
+        
+        #loader { text-align: center; padding: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="https://i.imgur.com/G4xK2uE.jpeg" alt="Logo">
+        <h1>Status de Caminhão na Oficina</h1>
+    </div>
+
+    <button class="btn-refresh" onclick="carregarOficina()">🔄 Atualizar Status</button>
+
+    <div id="loader">Buscando informações na oficina...</div>
+
+    <div class="table-card" id="tableBox" style="display:none">
+        <table>
+            <thead>
+                <tr>
+                    <th>Frota</th>
+                    <th>Tipo de Manutenção</th>
+                    <th>Previsão de Saída</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="listaOficina"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // SUBSTITUA PELA URL DO SEU SCRIPT DE OFICINA
+        const URL_SCRIPT_OFICINA = "https://script.google.com/macros/s/AKfycbwrNtFPBq8nGeIGwKyJL3IOModLRVc7aqGlARUBr0XpXkG_63PwTB-RNFmSuX00gaQe/exec";
+
+        async function carregarOficina() {
+            const loader = document.getElementById('loader');
+            const tableBox = document.getElementById('tableBox');
+            const lista = document.getElementById('listaOficina');
+
+            loader.style.display = 'block';
+            tableBox.style.display = 'none';
+
+            try {
+                const res = await fetch(URL_SCRIPT_OFICINA);
+                const dados = await res.json();
+                
+                lista.innerHTML = "";
+                dados.forEach(c => {
+                    lista.innerHTML += `
+                        <tr>
+                            <td><b>${c.frota}</b></td>
+                            <td>${c.tipo}</td>
+                            <td style="color:var(--sv-yellow)">${c.previsao}</td>
+                            <td><span class="status-badge">EM MANUTENÇÃO</span></td>
+                        </tr>
+                    `;
+                });
+
+                loader.style.display = 'none';
+                tableBox.style.display = 'block';
+            } catch (e) {
+                loader.innerText = "Erro ao carregar dados da oficina.";
+            }
+        }
+
+        // Carrega ao abrir
+        carregarOficina();
+    </script>
+</body>
+</html>
