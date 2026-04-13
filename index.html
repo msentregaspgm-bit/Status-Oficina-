@@ -3,64 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status Oficina - SV LOG</title>
+    <title>Oficina SV LOG - Status</title>
     <style>
-        :root { --sv-blue-dark: #001D3D; --sv-blue-mid: #003566; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 15px; }
-        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 3px solid var(--sv-yellow); border-radius: 8px; margin-bottom: 15px; text-align: center; }
-        .table-card { background: var(--sv-blue-mid); border-radius: 12px; padding: 10px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 12px; color: var(--sv-yellow); font-size: 11px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-        .status-badge { background: rgba(255, 214, 10, 0.1); color: var(--sv-yellow); padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid var(--sv-yellow); font-size: 11px; text-transform: uppercase; }
-        .btn-zap { background: #25D366; color: white; padding: 8px 12px; border-radius: 6px; font-weight: 800; font-size: 10px; text-decoration: none; display: inline-block; }
+        :root {
+            --sv-blue-dark: #000814;
+            --sv-blue-mid: #001D3D;
+            --sv-blue-light: #003566;
+            --sv-yellow: #FFD60A;
+            --sv-text: #E0E1DD;
+            --whatsapp: #25D366;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--sv-blue-dark);
+            color: var(--sv-text);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--sv-blue-mid), var(--sv-blue-light));
+            padding: 20px;
+            border-radius: 15px;
+            border-bottom: 4px solid var(--sv-yellow);
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .action-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-refresh { background: var(--sv-yellow); color: var(--sv-blue-dark); }
+        .btn-zap-geral { background: var(--whatsapp); color: white; }
+        .btn:active { transform: scale(0.98); }
+
+        .card-oficina {
+            background: var(--sv-blue-mid);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(0,0,0,0.2);
+            color: var(--sv-yellow);
+            padding: 15px 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        .frota-id { font-weight: 900; color: white; font-size: 15px; }
+        .previsao-txt { color: var(--sv-yellow); font-weight: 600; font-family: monospace; }
+        
+        .status-pill {
+            background: rgba(255, 214, 10, 0.1);
+            color: var(--sv-yellow);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid var(--sv-yellow);
+        }
+
+        .btn-zap-small {
+            background: var(--whatsapp);
+            color: white;
+            padding: 6px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 18px;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        #loading { text-align: center; padding: 40px; font-weight: bold; color: var(--sv-yellow); }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div class="header">
-        <h1 style="margin:0; font-size:18px;">STATUS DE CAMINHÃO NA OFICINA</h1>
+        <h1>Status de Oficina SV LOG</h1>
     </div>
 
-    <div class="table-card">
+    <div class="action-bar">
+        <button class="btn btn-refresh" onclick="carregar()">🔄 Atualizar</button>
+        <a id="linkGeral" class="btn btn-zap-geral" target="_blank">🟢 Status Geral</a>
+    </div>
+
+    <div id="loading">Carregando dados...</div>
+
+    <div class="card-oficina" id="tabela" style="display:none">
         <table>
             <thead>
                 <tr>
                     <th>Frota</th>
-                    <th>Manutenção</th>
-                    <th>Previsão de Saída</th>
-                    <th>Status</th>
-                    <th>Ação</th>
+                    <th>Previsão Saída</th>
+                    <th>Status Atual</th>
+                    <th>ZAP</th>
                 </tr>
             </thead>
             <tbody id="listaOficina"></tbody>
         </table>
     </div>
+</div>
 
-    <script>
-        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby8y4Yj_FuAjjspW3WhPCBK-U0xmmtCZQicyDPG2XygFbu4JgSmy0-pIjB6pnIIYoS5/exec";
+<script>
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbythueSk4s7uMQt2W7RSZb-rphjg6TsFBZLwMWSyiXSWrexYBkn5PqEaGEoWkFkpolR/exec"; // COLOQUE A URL DO SEU SCRIPT AQUI
 
-        async function carregar() {
+    async function carregar() {
+        const loading = document.getElementById('loading');
+        const tabela = document.getElementById('tabela');
+        const lista = document.getElementById('listaOficina');
+        
+        loading.style.display = 'block';
+        tabela.style.display = 'none';
+
+        try {
             const res = await fetch(URL_SCRIPT);
             const dados = await res.json();
-            const lista = document.getElementById('listaOficina');
-            lista.innerHTML = "";
             
+            let html = "";
+            let textoGeral = "*RESUMO GERAL OFICINA - SV LOG*\n\n";
+
             dados.forEach(c => {
-                const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n*Frota:* ${c.frota}\n*Serviço:* ${c.tipo}\n*Previsão:* ${c.previsao}\n*Status:* ${c.status}`);
+                // Monta texto individual para cada linha
+                const textoIndiv = `*Frota:* ${c.frota} | *Previsão:* ${c.previsao} | *Status:* ${c.status}`;
+                const linkZapIndiv = `https://wa.me/?text=${encodeURIComponent(textoIndiv)}`;
                 
-                lista.innerHTML += `
+                // Acumula para o Status Geral
+                textoGeral += `🚛 *${c.frota}* - ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
+
+                html += `
                     <tr>
-                        <td><b>${c.frota}</b></td>
-                        <td>${c.tipo}</td>
-                        <td style="color:var(--sv-yellow); font-weight:bold;">${c.previsao}</td>
-                        <td><span class="status-badge">${c.status}</span></td>
-                        <td><a href="https://wa.me/?text=${msgZap}" target="_blank" class="btn-zap">WHATSAPP</a></td>
+                        <td class="frota-id">${c.frota}<br><small style="font-weight:normal; color:#888">${c.tipo}</small></td>
+                        <td class="previsao-txt">${c.previsao}</td>
+                        <td><span class="status-pill">${c.status.toUpperCase()}</span></td>
+                        <td><a href="${linkZapIndiv}" target="_blank" class="btn-zap-small">📲</a></td>
                     </tr>
                 `;
             });
+
+            lista.innerHTML = html;
+            document.getElementById('linkGeral').href = `https://wa.me/?text=${encodeURIComponent(textoGeral)}`;
+            
+            loading.style.display = 'none';
+            tabela.style.display = 'block';
+        } catch (e) {
+            loading.innerText = "Erro ao carregar dados.";
         }
-        carregar();
-    </script>
+    }
+
+    carregar();
+</script>
+
 </body>
 </html>
