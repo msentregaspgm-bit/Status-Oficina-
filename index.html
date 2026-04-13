@@ -3,38 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SV LOG - Status Oficina</title>
+    <title>Status Oficina - SV LOG</title>
     <style>
         :root { --sv-blue-dark: #001D3D; --sv-blue-mid: #003566; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 10px; }
-        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 3px solid var(--sv-yellow); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .header h1 { margin: 0; font-size: 16px; text-transform: uppercase; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 15px; }
+        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 3px solid var(--sv-yellow); border-radius: 8px; margin-bottom: 15px; text-align: center; }
         .table-card { background: var(--sv-blue-mid); border-radius: 12px; padding: 10px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { text-align: left; padding: 12px; color: var(--sv-yellow); font-size: 11px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.1); }
         td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-        .status-badge { background: #ffd60a22; color: var(--sv-yellow); padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid var(--sv-yellow); font-size: 11px; }
-        .btn-zap { background: #25D366; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 10px; text-decoration: none; display: inline-block; }
-        .btn-refresh { background: var(--sv-yellow); color: var(--sv-blue-dark); border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-bottom: 15px; cursor: pointer; }
+        .status-badge { background: rgba(255, 214, 10, 0.1); color: var(--sv-yellow); padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid var(--sv-yellow); font-size: 11px; text-transform: uppercase; }
+        .btn-zap { background: #25D366; color: white; padding: 8px 12px; border-radius: 6px; font-weight: 800; font-size: 10px; text-decoration: none; display: inline-block; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Status Oficina SV LOG</h1>
-        <button onclick="carregarOficina()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">🔄</button>
+        <h1 style="margin:0; font-size:18px;">STATUS DE CAMINHÃO NA OFICINA</h1>
     </div>
 
-    <div id="loader" style="text-align:center; padding:20px;">Carregando frota...</div>
-
-    <div class="table-card" id="tableBox" style="display:none">
+    <div class="table-card">
         <table>
             <thead>
                 <tr>
                     <th>Frota</th>
                     <th>Manutenção</th>
-                    <th>Previsão</th>
-                    <th>Status Atual</th>
+                    <th>Previsão de Saída</th>
+                    <th>Status</th>
                     <th>Ação</th>
                 </tr>
             </thead>
@@ -43,42 +38,29 @@
     </div>
 
     <script>
-        const URL_SCRIPT_OFICINA = "https://script.google.com/macros/s/AKfycby8y4Yj_FuAjjspW3WhPCBK-U0xmmtCZQicyDPG2XygFbu4JgSmy0-pIjB6pnIIYoS5/exec";
+        const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby8y4Yj_FuAjjspW3WhPCBK-U0xmmtCZQicyDPG2XygFbu4JgSmy0-pIjB6pnIIYoS5/exec";
 
-        async function carregarOficina() {
-            const loader = document.getElementById('loader');
-            const tableBox = document.getElementById('tableBox');
+        async function carregar() {
+            const res = await fetch(URL_SCRIPT);
+            const dados = await res.json();
             const lista = document.getElementById('listaOficina');
-
-            try {
-                const res = await fetch(URL_SCRIPT_OFICINA);
-                const dados = await res.json();
+            lista.innerHTML = "";
+            
+            dados.forEach(c => {
+                const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n*Frota:* ${c.frota}\n*Serviço:* ${c.tipo}\n*Previsão:* ${c.previsao}\n*Status:* ${c.status}`);
                 
-                lista.innerHTML = "";
-                dados.forEach(c => {
-                    // Monta o link do WhatsApp
-                    const msg = window.encodeURIComponent(`*INFORMATIVO OFICINA SV LOG*\n\n*Frota:* ${c.frota}\n*Serviço:* ${c.tipo}\n*Previsão:* ${c.previsao}\n*Status:* ${c.statusManual}`);
-                    const linkZap = `https://wa.me/?text=${msg}`;
-
-                    lista.innerHTML += `
-                        <tr>
-                            <td><b>${c.frota}</b></td>
-                            <td>${c.tipo}</td>
-                            <td style="color:var(--sv-yellow)">${c.previsao}</td>
-                            <td><span class="status-badge">${c.statusManual.toUpperCase()}</span></td>
-                            <td><a href="${linkZap}" target="_blank" class="btn-zap">ENVIAR WHATSAPP</a></td>
-                        </tr>
-                    `;
-                });
-
-                loader.style.display = 'none';
-                tableBox.style.display = 'block';
-            } catch (e) {
-                loader.innerText = "Erro ao carregar dados.";
-            }
+                lista.innerHTML += `
+                    <tr>
+                        <td><b>${c.frota}</b></td>
+                        <td>${c.tipo}</td>
+                        <td style="color:var(--sv-yellow); font-weight:bold;">${c.previsao}</td>
+                        <td><span class="status-badge">${c.status}</span></td>
+                        <td><a href="https://wa.me/?text=${msgZap}" target="_blank" class="btn-zap">WHATSAPP</a></td>
+                    </tr>
+                `;
+            });
         }
-
-        carregarOficina();
+        carregar();
     </script>
 </body>
 </html>
