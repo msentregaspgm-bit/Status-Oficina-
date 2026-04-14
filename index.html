@@ -163,7 +163,7 @@
             // Mostra os mais recentes primeiro
             dados.reverse().forEach(c => {
                 const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`);
-                resumo += `🚛 *${c.frota}* - ${c.tipo}\n📌 ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
+                resumoGeral += `🚛 *Frota: ${c.frota}*\n🛠️ Serv: ${c.tipo}\n📅 Saída: ${c.previsao}\n📌 Status: ${c.status}\n\n`;
                 
                 html += `<tr>
                     <td><span class="frota-txt">${c.frota}</span><br><span class="manut-sub">${c.tipo}</span></td>
