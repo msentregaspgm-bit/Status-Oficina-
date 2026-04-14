@@ -7,31 +7,23 @@
     <style>
         :root { --sv-blue-dark: #000814; --sv-blue-mid: #001D3D; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; --whatsapp: #25D366; --vermelho: #ef4444; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 10px; }
-        
-        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 4px solid var(--sv-yellow); border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 4px solid var(--sv-yellow); border-radius: 12px; text-align: center; margin-bottom: 15px; }
         .header h1 { margin:0; font-size:18px; text-transform:uppercase; color:white; }
-
-        /* FORMULÁRIO */
         .form-card { background: var(--sv-blue-mid); padding: 15px; border-radius: 12px; margin-bottom: 15px; display: none; border: 1px solid var(--sv-yellow); }
         input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; }
-        
         .action-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
         .btn { border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; color: #000; text-decoration: none; }
         .btn-add { background: white; }
         .btn-refresh { background: var(--sv-yellow); }
         .btn-zap-geral { background: var(--whatsapp); color: white; }
         .btn-save { background: var(--sv-yellow); width: 100%; font-size: 14px; margin-top: 10px; }
-
-        /* TABELA */
         .table-card { background: var(--sv-blue-mid); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         table { width: 100%; border-collapse: collapse; min-width: 650px; }
         th { background: rgba(0,0,0,0.2); color: var(--sv-yellow); padding: 12px; font-size: 10px; text-transform: uppercase; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-        
         .frota-txt { font-weight: 800; color: white; font-size: 15px; }
         .previsao-txt { color: var(--sv-yellow); font-weight: 700; }
         .status-pill { border: 1px solid var(--sv-yellow); color: var(--sv-yellow); padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; }
-        
         .btn-delete { background: var(--vermelho); color: white; border: none; padding: 5px 8px; border-radius: 4px; font-weight: bold; font-size: 9px; cursor: pointer; }
     </style>
 </head>
@@ -50,7 +42,7 @@
     <input type="text" id="f_frota" placeholder="Nº Frota">
     <input type="text" id="f_tipo" placeholder="Tipo de Manutenção">
     <input type="datetime-local" id="f_previsao">
-    <input type="text" id="f_status" placeholder="Status Manual (Ex: Aguardando Peça)">
+    <input type="text" id="f_status" placeholder="Status Manual">
     <button class="btn btn-save" id="btnSalvar" onclick="salvar()">SALVAR NA PLANILHA</button>
 </div>
 
@@ -66,7 +58,7 @@
 </div>
 
 <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxCEEmnUykELUgbsUjl4XEJiKmRCGNEFaPKTasBEBCgxiWQxzojVFW7Zl-OdET2dMIN/exec";
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby5YyAPPfH-5c-piLfNoVvCnX7VQpozblQUdUCKIVt1lG4bY741fuu2dPWD4LduRNKZ/exec";
 
     function toggleForm() {
         const f = document.getElementById('formRegistro');
@@ -84,11 +76,13 @@
             const dados = await res.json();
             const lista = document.getElementById('listaOficina');
             let html = "";
-            let resumo = "*RESUMO OFICINA SV LOG*\n\n";
+            let resumo = "*INFORMATIVO OFICINA SV LOG*\n\n";
 
             dados.reverse().forEach(c => {
-                const msgZap = encodeURIComponent(`*STATUS OFICINA*\nFrota: ${c.frota}\nServiço: ${c.tipo}\nSaída: ${c.previsao}\nStatus: ${c.status}`);
-                resumo += `🚛 *${c.frota}* - ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
+                // Mensagem Individual incluindo TIPO
+                const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`);
+                
+                resumo += `🚛 *${c.frota}* - ${c.tipo}\n📌 ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
                 
                 html += `<tr>
                     <td><span class="frota-txt">${c.frota}</span><br><small style="color:#888">${c.tipo}</small></td>
@@ -112,10 +106,7 @@
     async function darBaixa(frota) {
         if (!confirm("Confirmar saída do veículo " + frota + "?")) return;
         try {
-            await fetch(URL_SCRIPT, {
-                method: "POST",
-                body: JSON.stringify({ action: "delete", frota: frota })
-            });
+            await fetch(URL_SCRIPT, { method: "POST", body: JSON.stringify({ action: "delete", frota: frota }) });
             alert("Baixa realizada!");
             carregar();
         } catch (e) { alert("Erro ao processar baixa."); }
@@ -125,13 +116,14 @@
         const btn = document.getElementById('btnSalvar');
         const frota = document.getElementById('f_frota').value;
         const dataInput = document.getElementById('f_previsao').value;
-        
         if(!frota || !dataInput) return alert("Preencha Frota e Data!");
 
         btn.innerText = "SALVANDO...";
         btn.disabled = true;
 
-        const dataBr = dataInput.split('T')[0].split('-').reverse().join('/') + ' ' + dataInput.split('T')[1];
+        // Formata a data para a planilha
+        const d = new Date(dataInput);
+        const dataBr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
 
         const obj = {
             frota: frota,
@@ -147,7 +139,6 @@
             toggleForm();
             carregar();
         } catch (e) { alert("Erro ao salvar."); }
-        
         btn.innerText = "SALVAR NA PLANILHA";
         btn.disabled = false;
     }
