@@ -3,103 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oficina SV LOG - Status</title>
+    <title>Oficina SV LOG</title>
     <style>
-        :root { 
-            --sv-blue-dark: #000814; 
-            --sv-blue-mid: #001D3D; 
-            --sv-yellow: #FFD60A; 
-            --sv-text: #E0E1DD; 
-            --whatsapp: #25D366; 
-            --vermelho: #ef4444; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--sv-blue-dark); 
-            color: var(--sv-text); 
-            margin: 0; 
-            padding: 10px; 
-        }
-        
-        .header { 
-            background: var(--sv-blue-mid); 
-            padding: 15px; 
-            border-bottom: 4px solid var(--sv-yellow); 
-            border-radius: 12px; 
-            text-align: center; 
-            margin-bottom: 10px; 
-        }
-        
-        .header h1 { margin: 0; font-size: 18px; text-transform: uppercase; color: white; }
-
-        /* FORMULÁRIO */
-        .form-card { 
-            background: var(--sv-blue-mid); 
-            padding: 15px; 
-            border-radius: 12px; 
-            margin-bottom: 15px; 
-            display: none; 
-            border: 1px solid var(--sv-yellow); 
-        }
-        
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border-radius: 6px; 
-            border: 1px solid #444; 
-            background: #000; 
-            color: white; 
-            box-sizing: border-box; 
-            font-size: 14px;
-        }
-        
-        /* BOTÕES */
+        :root { --sv-blue-dark: #000814; --sv-blue-mid: #001D3D; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; --whatsapp: #25D366; --vermelho: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 10px; }
+        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 4px solid var(--sv-yellow); border-radius: 12px; text-align: center; margin-bottom: 10px; }
+        .header h1 { margin:0; font-size:18px; text-transform:uppercase; color:white; }
+        .form-card { background: var(--sv-blue-mid); padding: 15px; border-radius: 12px; margin-bottom: 15px; display: none; border: 1px solid var(--sv-yellow); }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 14px; }
         .action-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        
-        .btn { 
-            border: none; 
-            padding: 12px; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 5px; 
-            color: #000; 
-            text-decoration: none; 
-        }
-        
+        .btn { border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; color: #000; text-decoration: none; }
         .btn-add { background: white; }
         .btn-refresh { background: var(--sv-yellow); }
         .btn-zap-geral { background: var(--whatsapp); color: white; }
-        .btn-save { background: var(--sv-yellow); width: 100%; font-size: 14px; margin-top: 10px; color: #000; }
-
-        /* TABELA */
+        .btn-save { background: var(--sv-yellow); width: 100%; font-size: 14px; margin-top: 10px; }
         .table-card { background: var(--sv-blue-mid); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        
         table { width: 100%; border-collapse: collapse; min-width: 650px; }
-        
-        th { 
-            background: rgba(0,0,0,0.2); 
-            color: var(--sv-yellow); 
-            padding: 12px; 
-            font-size: 10px; 
-            text-transform: uppercase; 
-            text-align: left; 
-        }
-        
+        th { background: rgba(0,0,0,0.2); color: var(--sv-yellow); padding: 12px; font-size: 10px; text-transform: uppercase; text-align: left; }
         td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-        
         .frota-txt { font-weight: 800; color: white; font-size: 15px; }
-        .manut-sub { color: #888; font-size: 11px; display: block; margin-top: 2px; text-transform: uppercase; }
-        .previsao-txt { color: var(--sv-yellow); font-weight: 700; }
+        .manut-sub { color: #888; font-size: 11px; text-transform: uppercase; }
+        .previsao-txt { color: var(--sv-yellow); font-weight: 700; white-space: nowrap; }
         .status-pill { border: 1px solid var(--sv-yellow); color: var(--sv-yellow); padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        
         .btn-delete { background: var(--vermelho); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; font-size: 9px; cursor: pointer; }
     </style>
 </head>
@@ -114,33 +39,27 @@
 </div>
 
 <div id="formRegistro" class="form-card">
-    <h3 style="margin:0; color:var(--sv-yellow); font-size: 14px;">NOVA ENTRADA NA OFICINA</h3>
-    <input type="text" id="f_frota" placeholder="Nº da Frota">
-    <input type="text" id="f_tipo" placeholder="Tipo de Manutenção (Ex: Motor)">
+    <h3 style="margin:0; color:var(--sv-yellow); font-size:14px;">NOVA ENTRADA</h3>
+    <input type="text" id="f_frota" placeholder="Nº Frota">
+    <input type="text" id="f_tipo" placeholder="Tipo de Manutenção">
     <input type="datetime-local" id="f_previsao">
-    <input type="text" id="f_status" placeholder="Status (Ex: Aguardando Peça)">
+    <input type="text" id="f_status" placeholder="Status Manual">
     <button class="btn btn-save" id="btnSalvar" onclick="salvar()">SALVAR NA PLANILHA</button>
 </div>
 
-<div id="loader" style="text-align:center; padding:20px; font-weight:bold; color:var(--sv-yellow);">Sincronizando oficina...</div>
+<div id="loader" style="text-align:center; padding:20px; font-weight:bold; color:var(--sv-yellow);">Sincronizando...</div>
 
 <div class="table-card" id="contentBox" style="display:none">
     <table>
         <thead>
-            <tr>
-                <th>Frota / Manut.</th>
-                <th>Previsão Saída</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
+            <tr><th>Frota / Manut.</th><th>Previsão Saída</th><th>Status</th><th>Ações</th></tr>
         </thead>
         <tbody id="listaOficina"></tbody>
     </table>
 </div>
 
 <script>
-    // COLE SUA URL DO GOOGLE SCRIPT AQUI
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyxBxHiZjyJKxkNj1WePRAPkl1a1vvxMojmrhyE4B636UAlVKurBurJrleFI4dvBT6u/exec";
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbx_dopxVB8t96f6Pz_I3tTUh7C-cN7WzogYPBUDNJhsLZaKJ6oXxJt30FuIDGWVBClY/exec";
 
     function toggleForm() {
         const f = document.getElementById('formRegistro');
@@ -158,12 +77,14 @@
             const dados = await res.json();
             const lista = document.getElementById('listaOficina');
             let html = "";
-            let resumo = "*INFORMATIVO OFICINA SV LOG*\n\n";
+            let resumoGeral = "*INFORMATIVO OFICINA SV LOG*\n\n";
 
-            // Mostra os mais recentes primeiro
             dados.reverse().forEach(c => {
-                const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`);
-                resumo += `🚛 *${c.frota}* - ${c.tipo}\n📌 ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
+                // FORMATO DA MENSAGEM IGUAL À IMAGEM
+                const textoBase = `\n🚚 *Frota:* ${c.frota}\n🛠️ *Serv:* ${c.tipo}\n🗓️ *Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`;
+                const msgZap = encodeURIComponent(`*INFORMATIVO OFICINA SV LOG*\n${textoBase}`);
+                
+                resumoGeral += `${textoBase}\n--------------------`;
                 
                 html += `<tr>
                     <td><span class="frota-txt">${c.frota}</span><br><span class="manut-sub">${c.tipo}</span></td>
@@ -178,45 +99,39 @@
                 </tr>`;
             });
             lista.innerHTML = html;
-            document.getElementById('btnGeral').href = "https://wa.me/?text=" + encodeURIComponent(resumo);
+            document.getElementById('btnGeral').href = "https://wa.me/?text=" + encodeURIComponent(resumoGeral);
             loader.style.display = 'none';
             contentBox.style.display = 'block';
-        } catch (e) { 
-            loader.innerText = "Erro ao carregar dados da planilha."; 
-            console.error(e);
-        }
+        } catch (e) { loader.innerText = "Erro ao carregar dados."; }
     }
 
     async function darBaixa(frota) {
         if (!confirm("Confirmar saída do veículo " + frota + "?")) return;
         try {
             await fetch(URL_SCRIPT, { method: "POST", body: JSON.stringify({ action: "delete", frota: frota }) });
-            alert("Veículo retirado da oficina!");
+            alert("Baixa concluída!");
             carregar();
-        } catch (e) { alert("Erro ao processar saída."); }
+        } catch (e) { alert("Erro ao processar."); }
     }
 
     async function salvar() {
         const btn = document.getElementById('btnSalvar');
         const frota = document.getElementById('f_frota').value;
-        const tipo = document.getElementById('f_tipo').value;
         const dataInput = document.getElementById('f_previsao').value;
-        const status = document.getElementById('f_status').value;
-
         if(!frota || !dataInput) return alert("Preencha Frota e Data!");
 
         btn.innerText = "SALVANDO...";
         btn.disabled = true;
 
-        // Formata data do input para Texto (BR) antes de enviar
+        // Formata a data do input para Texto antes de enviar
         const d = new Date(dataInput);
-        const dataFormatada = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        const dataBr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
 
         const obj = {
             frota: frota,
-            tipo: tipo || "Geral",
-            previsao: dataFormatada,
-            status: status || "Em Manutenção"
+            tipo: document.getElementById('f_tipo').value || "Geral",
+            previsao: dataBr,
+            status: document.getElementById('f_status').value || "Em Manutenção"
         };
 
         try {
@@ -226,7 +141,6 @@
             toggleForm();
             carregar();
         } catch (e) { alert("Erro ao salvar."); }
-        
         btn.innerText = "SALVAR NA PLANILHA";
         btn.disabled = false;
     }
