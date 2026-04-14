@@ -2,150 +2,203 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Oficina SV LOG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Oficina - SV LOG</title>
     <style>
-        :root { --sv-blue-dark: #000814; --sv-blue-mid: #001D3D; --sv-yellow: #FFD60A; --sv-text: #E0E1DD; --whatsapp: #25D366; --vermelho: #ef4444; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--sv-blue-dark); color: var(--sv-text); margin: 0; padding: 10px; }
-        .header { background: var(--sv-blue-mid); padding: 15px; border-bottom: 4px solid var(--sv-yellow); border-radius: 12px; text-align: center; margin-bottom: 10px; }
-        .header h1 { margin:0; font-size:18px; text-transform:uppercase; color:white; }
-        .form-card { background: var(--sv-blue-mid); padding: 15px; border-radius: 12px; margin-bottom: 15px; display: none; border: 1px solid var(--sv-yellow); }
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 14px; }
-        .action-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .btn { border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; color: #000; text-decoration: none; }
-        .btn-add { background: white; }
-        .btn-refresh { background: var(--sv-yellow); }
+        :root {
+            --sv-blue-dark: #000814;
+            --sv-blue-mid: #001D3D;
+            --sv-blue-light: #003566;
+            --sv-yellow: #FFD60A;
+            --sv-text: #E0E1DD;
+            --whatsapp: #25D366;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--sv-blue-dark);
+            color: var(--sv-text);
+            margin: 0;
+            padding: 10px;
+        }
+
+        .header {
+            background: var(--sv-blue-mid);
+            padding: 20px;
+            border-radius: 12px;
+            border-bottom: 4px solid var(--sv-yellow);
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-refresh { background: var(--sv-yellow); color: var(--sv-blue-dark); }
         .btn-zap-geral { background: var(--whatsapp); color: white; }
-        .btn-save { background: var(--sv-yellow); width: 100%; font-size: 14px; margin-top: 10px; }
-        .table-card { background: var(--sv-blue-mid); border-radius: 12px; overflow-x: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        table { width: 100%; border-collapse: collapse; min-width: 650px; }
-        th { background: rgba(0,0,0,0.2); color: var(--sv-yellow); padding: 12px; font-size: 10px; text-transform: uppercase; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
-        .frota-txt { font-weight: 800; color: white; font-size: 15px; }
-        .manut-sub { color: #888; font-size: 11px; text-transform: uppercase; }
+
+        .card-oficina {
+            background: var(--sv-blue-mid);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(0,0,0,0.2);
+            color: var(--sv-yellow);
+            padding: 15px 10px;
+            font-size: 10px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+
+        .frota-txt { font-weight: 800; color: white; font-size: 16px; }
+        .tipo-manutencao { color: #aaa; font-size: 11px; text-transform: uppercase; display: block; margin-top: 2px; }
         .previsao-txt { color: var(--sv-yellow); font-weight: 700; white-space: nowrap; }
-        .status-pill { border: 1px solid var(--sv-yellow); color: var(--sv-yellow); padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .btn-delete { background: var(--vermelho); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; font-size: 9px; cursor: pointer; }
+        
+        .status-pill {
+            background: rgba(255, 214, 10, 0.1);
+            color: var(--sv-yellow);
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid var(--sv-yellow);
+            display: inline-block;
+        }
+
+        .btn-zap-row {
+            background: var(--whatsapp);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        #loader { text-align: center; padding: 40px; color: var(--sv-yellow); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="header"><h1>STATUS OFICINA SV LOG</h1></div>
+<div class="header">
+    <h1>STATUS DE CAMINHÃO NA OFICINA</h1>
+</div>
 
 <div class="action-bar">
-    <button class="btn btn-add" onclick="toggleForm()">➕ Novo</button>
-    <button class="btn btn-refresh" onclick="carregar()">🔄 Atualizar</button>
-    <a id="btnGeral" class="btn btn-zap-geral" target="_blank">📲 Geral</a>
+    <button class="btn btn-refresh" onclick="carregarOficina()">🔄 Atualizar</button>
+    <a id="btnGeral" class="btn btn-zap-geral" target="_blank">📲 Status Geral</a>
 </div>
 
-<div id="formRegistro" class="form-card">
-    <h3 style="margin:0; color:var(--sv-yellow); font-size:14px;">NOVA ENTRADA</h3>
-    <input type="text" id="f_frota" placeholder="Nº Frota">
-    <input type="text" id="f_tipo" placeholder="Tipo de Manutenção">
-    <input type="datetime-local" id="f_previsao">
-    <input type="text" id="f_status" placeholder="Status Manual">
-    <button class="btn btn-save" id="btnSalvar" onclick="salvar()">SALVAR NA PLANILHA</button>
-</div>
+<div id="loader">A carregar oficina...</div>
 
-<div id="loader" style="text-align:center; padding:20px; font-weight:bold; color:var(--sv-yellow);">Sincronizando...</div>
-
-<div class="table-card" id="contentBox" style="display:none">
+<div class="card-oficina" id="contentBox" style="display:none">
     <table>
         <thead>
-            <tr><th>Frota / Manut.</th><th>Previsão Saída</th><th>Status</th><th>Ações</th></tr>
+            <tr>
+                <th>Frota / Manutenção</th>
+                <th>Previsão Saída</th>
+                <th>Status Atual</th>
+                <th>WhatsApp</th>
+            </tr>
         </thead>
         <tbody id="listaOficina"></tbody>
     </table>
 </div>
 
 <script>
-    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbx_dopxVB8t96f6Pz_I3tTUh7C-cN7WzogYPBUDNJhsLZaKJ6oXxJt30FuIDGWVBClY/exec";
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyJ559MRtmbDMh0PAUgAHM31_2HcCFWVKWuuymP0ol_WPHD9E_YRRp0TOg-aPwyJbKc/exec";
 
-    function toggleForm() {
-        const f = document.getElementById('formRegistro');
-        f.style.display = f.style.display === 'block' ? 'none' : 'block';
-    }
-
-    async function carregar() {
+    async function carregarOficina() {
         const loader = document.getElementById('loader');
         const contentBox = document.getElementById('contentBox');
+        const lista = document.getElementById('listaOficina');
+        const btnGeral = document.getElementById('btnGeral');
+        
         loader.style.display = 'block';
         contentBox.style.display = 'none';
 
         try {
             const res = await fetch(URL_SCRIPT);
             const dados = await res.json();
-            const lista = document.getElementById('listaOficina');
+            
             let html = "";
             let resumoGeral = "*INFORMATIVO OFICINA SV LOG*\n\n";
 
-            dados.reverse().forEach(c => {
-                // FORMATO DA MENSAGEM IGUAL À IMAGEM
-                const textoBase = `\n🚚 *Frota:* ${c.frota}\n🛠️ *Serv:* ${c.tipo}\n🗓️ *Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`;
-                const msgZap = encodeURIComponent(`*INFORMATIVO OFICINA SV LOG*\n${textoBase}`);
+            dados.forEach(c => {
+                const msgIndiv = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão:* ${c.previsao}\n📌 *Status:* ${c.status}`);
                 
-                resumoGeral += `${textoBase}\n--------------------`;
-                
-                html += `<tr>
-                    <td><span class="frota-txt">${c.frota}</span><br><span class="manut-sub">${c.tipo}</span></td>
-                    <td class="previsao-txt">${c.previsao}</td>
-                    <td><span class="status-pill">${c.status}</span></td>
-                    <td>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <a href="https://wa.me/?text=${msgZap}" target="_blank" style="text-decoration:none; font-size:18px;">📲</a>
-                            <button class="btn-delete" onclick="darBaixa('${c.frota}')">SAIR</button>
-                        </div>
-                    </td>
-                </tr>`;
+                resumoGeral += `🚛 *Frota: ${c.frota}*\n🛠️ Serv: ${c.tipo}\n📅 Saída: ${c.previsao}\n📌 Status: ${c.status}\n\n`;
+
+                html += `
+                    <tr>
+                        <td>
+                            <span class="frota-txt">${c.frota}</span>
+                            <span class="tipo-manutencao">${c.tipo}</span>
+                        </td>
+                        <td class="previsao-txt">${c.previsao}</td>
+                        <td><span class="status-pill">${c.status.toUpperCase()}</span></td>
+                        <td>
+                            <a href="https://wa.me/?text=${msgIndiv}" target="_blank" class="btn-zap-row">ENVIAR</a>
+                        </td>
+                    </tr>
+                `;
             });
+
             lista.innerHTML = html;
-            document.getElementById('btnGeral').href = "https://wa.me/?text=" + encodeURIComponent(resumoGeral);
+            btnGeral.href = `https://wa.me/?text=${encodeURIComponent(resumoGeral)}`;
+            
             loader.style.display = 'none';
             contentBox.style.display = 'block';
-        } catch (e) { loader.innerText = "Erro ao carregar dados."; }
+        } catch (e) {
+            loader.innerText = "Erro ao carregar dados.";
+        }
     }
 
-    async function darBaixa(frota) {
-        if (!confirm("Confirmar saída do veículo " + frota + "?")) return;
-        try {
-            await fetch(URL_SCRIPT, { method: "POST", body: JSON.stringify({ action: "delete", frota: frota }) });
-            alert("Baixa concluída!");
-            carregar();
-        } catch (e) { alert("Erro ao processar."); }
-    }
-
-    async function salvar() {
-        const btn = document.getElementById('btnSalvar');
-        const frota = document.getElementById('f_frota').value;
-        const dataInput = document.getElementById('f_previsao').value;
-        if(!frota || !dataInput) return alert("Preencha Frota e Data!");
-
-        btn.innerText = "SALVANDO...";
-        btn.disabled = true;
-
-        // Formata a data do input para Texto antes de enviar
-        const d = new Date(dataInput);
-        const dataBr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-
-        const obj = {
-            frota: frota,
-            tipo: document.getElementById('f_tipo').value || "Geral",
-            previsao: dataBr,
-            status: document.getElementById('f_status').value || "Em Manutenção"
-        };
-
-        try {
-            await fetch(URL_SCRIPT, { method: "POST", body: JSON.stringify(obj) });
-            alert("Salvo com sucesso!");
-            document.querySelectorAll('input').forEach(i => i.value = "");
-            toggleForm();
-            carregar();
-        } catch (e) { alert("Erro ao salvar."); }
-        btn.innerText = "SALVAR NA PLANILHA";
-        btn.disabled = false;
-    }
-
-    window.onload = carregar;
+    carregarOficina();
 </script>
+
 </body>
 </html>
