@@ -161,12 +161,11 @@
             let resumo = "*INFORMATIVO OFICINA SV LOG*\n\n";
 
             // Mostra os mais recentes primeiro
-            dados.forEach(c => {
-                const msgIndiv = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão:* ${c.previsao}\n📌 *Status:* ${c.status}`);
+            dados.reverse().forEach(c => {
+                const msgZap = encodeURIComponent(`*STATUS OFICINA SV LOG*\n\n🚛 *Frota:* ${c.frota}\n🛠️ *Manutenção:* ${c.tipo}\n📅 *Previsão Saída:* ${c.previsao}\n📌 *Status:* ${c.status}`);
+                resumo += `🚛 *${c.frota}* - ${c.tipo}\n📌 ${c.status}\n📅 Saída: ${c.previsao}\n\n`;
                 
-                resumoGeral += `🚛 *Frota: ${c.frota}*\n🛠️ Serv: ${c.tipo}\n📅 Saída: ${c.previsao}\n📌 Status: ${c.status}\n\n`;
-
-                html += `
+                html += `<tr>
                     <td><span class="frota-txt">${c.frota}</span><br><span class="manut-sub">${c.tipo}</span></td>
                     <td class="previsao-txt">${c.previsao}</td>
                     <td><span class="status-pill">${c.status}</span></td>
